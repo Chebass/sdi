@@ -1,0 +1,52 @@
+---
+import Brand from '../components/Brand.astro';
+import Icon from '../components/Icon.astro';
+import { company, whatsappUrl } from '../data/company';
+import '../styles/global.css';
+interface Props { title?: string; description?: string; }
+const { title = 'SDI Ingenieros · Seguridad desde la base', description = 'Diseño, instalación, mediciones y mantenimiento de sistemas de puesta a tierra. Conoce SDI Ingenieros y solicita asesoría para tu proyecto.' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = `${base}/`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const navigation = [['Inicio', 'inicio'], ['Nosotros', 'nosotros'], ['Servicios', 'servicios'], ['Experiencia', 'experiencia'], ['Contacto', 'contacto']];
+---
+<!doctype html>
+<html lang="es-PE">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#102b43" />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_PE" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(`${base}/images/arquitectura.jpg`, Astro.site)} />
+    <title>{title}</title>
+    <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: company.legalName, url: Astro.site, email: company.email, telephone: company.phone, address: { '@type': 'PostalAddress', streetAddress: company.address, addressLocality: 'Lima', addressCountry: 'PE' }, sameAs: company.socials.map(s => s.url) })} />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <div class="site-shell">
+      <header class="header">
+        <a href={home} aria-label="SDI Ingenieros, inicio"><Brand /></a>
+        <nav class="desktop-nav" aria-label="Navegación principal">{navigation.map(([label, id]) => <a href={`${home}#${id}`}>{label}</a>)}</nav>
+        <a class="button header-cta" href={whatsappUrl()} target="_blank" rel="noopener noreferrer">Solicitar asesoría <Icon name="diagonal" size={16} /></a>
+        <details class="mobile-menu"><summary aria-label="Abrir menú"><span></span><span></span><span></span></summary><nav aria-label="Navegación móvil">{navigation.map(([label, id]) => <a href={`${home}#${id}`}>{label}</a>)}<a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">Solicitar asesoría ↗</a></nav></details>
+      </header>
+      <slot />
+      <footer class="footer">
+        <div class="footer-main"><div><a href={home} aria-label="SDI Ingenieros, inicio"><Brand /></a><p>Ingeniería que protege.<br />Confianza que permanece.</p></div><div><span class="eyebrow">EXPLORA</span><a href={`${home}#nosotros`}>Nosotros</a><a href={`${home}#servicios`}>Servicios</a><a href={`${home}#experiencia`}>Nuestra experiencia</a></div><div><span class="eyebrow">CONVERSEMOS</span><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:+${company.whatsapp}`}>{company.phone}</a><p>{company.address}<br />Lima, Perú</p></div><div><span class="eyebrow">SIEMPRE CERCA</span><a href={whatsappUrl()} target="_blank" rel="noopener noreferrer">WhatsApp <Icon name="diagonal" size={16} /></a>{company.socials.map(s => <a href={s.url} target="_blank" rel="noopener noreferrer">{s.name} <Icon name="diagonal" size={16}/></a>)}</div></div>
+        <div class="footer-bottom"><span>© {new Date().getFullYear()} {company.legalName}. Todos los derechos reservados.</span><span>Diseñado para construir confianza.</span></div>
+      </footer>
+    </div>
+    <a class="whatsapp-float" href={whatsappUrl()} target="_blank" rel="noopener noreferrer" aria-label="Pedir información a SDI por WhatsApp"><Icon name="chat" size={25} /><span>Hablemos</span></a>
+    <script>
+      document.querySelectorAll('.mobile-menu nav a').forEach(link => link.addEventListener('click', () => document.querySelector('.mobile-menu')?.removeAttribute('open')));
+      document.addEventListener('keydown', event => { if (event.key === 'Escape') document.querySelector('.mobile-menu')?.removeAttribute('open'); });
+    </script>
+  </body>
+</html>

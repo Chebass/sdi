@@ -1,0 +1,19 @@
+---
+interface Props { name?: string; size?: number; }
+const { name = 'arrow', size = 24 } = Astro.props;
+const paths: Record<string, string> = {
+  arrow: 'M5 12h14m-6-6 6 6-6 6',
+  diagonal: 'M6 18 18 6M6 6h12v12',
+  plan: 'M4 3h16v18H4zM8 7h8M8 11h4M14 11h2M8 15h8M8 18h3',
+  ground: 'M12 3v12M4 15h16M7 19h10M10 22h4',
+  grid: 'M4 4h16v16H4zM4 12h16M12 4v16M8 8h0M16 16h0',
+  pulse: 'M2 12h5l3-8 4 16 3-8h5',
+  tool: 'm14 6 4 4M4 20l9-9M14 3a6 6 0 0 0-7 7l-4 4a4 4 0 0 0 6 6l4-4a6 6 0 0 0 8-7l-5 3-4-4z',
+  shield: 'm12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6zM8 12l3 3 5-6',
+  chat: 'M21 11.5a8.5 8.5 0 0 1-12.5 7.5L3 21l2-5.5A8.5 8.5 0 1 1 21 11.5ZM8 8c0 4 4 8 8 8l1-3-3-1-1 1-2-2 1-1-1-3z',
+  mail: 'M3 5h18v14H3zM3 5l9 8 9-8',
+  pin: 'M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0ZM15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
+  check: 'm5 12 4 4L19 6',
+};
+---
+<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={paths[name] || paths.arrow} /></svg>
