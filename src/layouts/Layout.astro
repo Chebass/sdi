@@ -3,6 +3,7 @@ import Brand from '../components/Brand.astro';
 import Icon from '../components/Icon.astro';
 import { company, whatsappUrl } from '../data/company';
 import '../styles/global.css';
+import '../styles/enhancements.css';
 interface Props { title?: string; description?: string; }
 const { title = 'SDI Ingenieros · Seguridad desde la base', description = 'Diseño, instalación, mediciones y mantenimiento de sistemas de puesta a tierra. Conoce SDI Ingenieros y solicita asesoría para tu proyecto.' } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');

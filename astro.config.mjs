@@ -5,4 +5,5 @@ export default defineConfig({
   base: process.env.BASE_PATH || '/sdi',
   output: 'static',
   trailingSlash: 'always',
+  devToolbar: { enabled: false },
 });
