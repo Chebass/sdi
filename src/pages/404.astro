@@ -2,4 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 const home = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 ---
-<Layout title="Página no encontrada · SDI Ingenieros"><main id="contenido" class="section"><span class="eyebrow">ERROR 404</span><h1>Volvamos a una base segura.</h1><p>La página que buscas no está disponible.</p><a class="button" href={home}>Volver al inicio →</a></main></Layout>
+
+<Layout title="Página no encontrada · SDI Ingenieros">
+  <main id="contenido" class="section">
+    <span class="eyebrow">ERROR 404</span>
+    <h1>Volvamos a una base segura.</h1>
+    <p>La página que buscas no está disponible.</p>
+    <a class="button" href={home}>
+      Volver al inicio →
+    </a>
+  </main>
+</Layout>

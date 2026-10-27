@@ -15,6 +15,7 @@ Abrir http://127.0.0.1:4321/sdi/.
 
 ```sh
 npm run check
+npm run format:check
 npm run build
 npm run preview
 ```
@@ -34,6 +35,8 @@ WhatsApp usa el número de la web anterior: **+51 997 084 825**. Los botones de 
 Por indicación del propietario se muestra únicamente WhatsApp como red de contacto. La lista `socials` queda vacía y permite agregar perfiles confirmados más adelante.
 
 Las animaciones respetan la preferencia de movimiento reducido del sistema. Las preguntas muestran una respuesta a la vez dentro del mismo espacio y admiten cierre con Escape; sin JavaScript se utiliza una lista desplegable nativa. La barra de herramientas de desarrollo de Astro está desactivada en la configuración.
+
+El selector de servicios usa Choices.js con estilos de la paleta SDI, selección por teclado y validación integrada al formulario. Sin JavaScript se mantiene el selector nativo. Para formatear Astro, CSS, TypeScript, JSON y documentación, ejecutar `npm run format`; `npm run format:check` comprueba el formato sin modificar archivos. Prettier omite dependencias, compilados y referencias locales.
 
 ## Publicación en GitHub Pages
 

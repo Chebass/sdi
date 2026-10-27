@@ -2,18 +2,86 @@
 import Icon from './Icon.astro';
 import { company } from '../data/company';
 const questions = [
-  { title: '¿Qué servicios ofrece SDI Ingenieros?', answer: 'Diseñamos, instalamos y mantenemos sistemas de puesta a tierra verticales y horizontales. También realizamos pruebas, mediciones de resistividad y asesoría técnica.' },
-  { title: '¿Cómo solicito una cotización?', answer: `Escríbenos por WhatsApp al ${company.phone} o a ${company.email}. Cuéntanos el tipo de servicio, ubicación y características de tu instalación para que podamos evaluar tu necesidad.` },
-  { title: '¿Ofrecen mantenimiento de sistemas existentes?', answer: 'Sí. Nuestro servicio incluye inspección, limpieza, protección contra corrosión, reparaciones y mediciones para evaluar el estado del sistema.' },
+  {
+    title: '¿Qué servicios ofrece SDI Ingenieros?',
+    answer:
+      'Diseñamos, instalamos y mantenemos sistemas de puesta a tierra verticales y horizontales. También realizamos pruebas, mediciones de resistividad y asesoría técnica.',
+  },
+  {
+    title: '¿Cómo solicito una cotización?',
+    answer: `Escríbenos por WhatsApp al ${company.phone} o a ${company.email}. Cuéntanos el tipo de servicio, ubicación y características de tu instalación para que podamos evaluar tu necesidad.`,
+  },
+  {
+    title: '¿Ofrecen mantenimiento de sistemas existentes?',
+    answer:
+      'Sí. Nuestro servicio incluye inspección, limpieza, protección contra corrosión, reparaciones y mediciones para evaluar el estado del sistema.',
+  },
 ];
 ---
+
 <section class="faq section" aria-labelledby="faq-title">
-  <div><span class="eyebrow">RESOLVEMOS TUS DUDAS</span><h2 id="faq-title">Hablemos<br /><span>con claridad.</span></h2></div>
-  <div class="faq-deck" hidden>
-    <div class="faq-questions">{questions.map((question, index) => <button class="faq-question" type="button" aria-expanded="false" aria-controls={`faq-panel-${index}`} id={`faq-trigger-${index}`} data-faq-open={index}><span class="faq-number">0{index + 1}</span><span>{question.title}</span><span class="faq-plus" aria-hidden="true">+</span></button>)}</div>
-    {questions.map((question, index) => <div class="faq-answer" id={`faq-panel-${index}`} role="region" aria-labelledby={`faq-answer-title-${index}`} hidden><span class="eyebrow">TU PREGUNTA / 0{index + 1}</span><button class="faq-close" type="button" aria-label="Cerrar respuesta y volver a las preguntas"><Icon name="close" size={19}/></button><h3 id={`faq-answer-title-${index}`}>{question.title}</h3><p>{question.answer}</p><span class="faq-answer-foot">CERCA DE TI, EN CADA ETAPA</span></div>)}
+  <div>
+    <span class="eyebrow">RESOLVEMOS TUS DUDAS</span>
+    <h2 id="faq-title">
+      Hablemos
+      <br />
+      <span>con claridad.</span>
+    </h2>
   </div>
-  <noscript><div>{questions.map(question => <details><summary>{question.title}<span>+</span></summary><p>{question.answer}</p></details>)}</div></noscript>
+  <div class="faq-deck" hidden>
+    <div class="faq-questions">
+      {questions.map((question, index) => (
+        <button
+          class="faq-question"
+          type="button"
+          aria-expanded="false"
+          aria-controls={`faq-panel-${index}`}
+          id={`faq-trigger-${index}`}
+          data-faq-open={index}
+        >
+          <span class="faq-number">0{index + 1}</span>
+          <span>{question.title}</span>
+          <span class="faq-plus" aria-hidden="true">
+            +
+          </span>
+        </button>
+      ))}
+    </div>
+    {questions.map((question, index) => (
+      <div
+        class="faq-answer"
+        id={`faq-panel-${index}`}
+        role="region"
+        aria-labelledby={`faq-answer-title-${index}`}
+        hidden
+      >
+        <span class="eyebrow">TU PREGUNTA / 0{index + 1}</span>
+        <button
+          class="faq-close"
+          type="button"
+          aria-label="Cerrar respuesta y volver a las preguntas"
+        >
+          <Icon name="close" size={19} />
+        </button>
+        <h3 id={`faq-answer-title-${index}`}>{question.title}</h3>
+        <p>{question.answer}</p>
+        <span class="faq-answer-foot">CERCA DE TI, EN CADA ETAPA</span>
+      </div>
+    ))}
+  </div>
+  <noscript>
+    <div>
+      {questions.map((question) => (
+        <details>
+          <summary>
+            {question.title}
+            <span>+</span>
+          </summary>
+          <p>{question.answer}</p>
+        </details>
+      ))}
+    </div>
+  </noscript>
 </section>
 <script>
   const deck = document.querySelector<HTMLElement>('.faq-deck');
@@ -30,26 +98,39 @@ const questions = [
     list.inert = false;
     lastTrigger?.setAttribute('aria-expanded', 'false');
     lastTrigger?.focus({ preventScroll: true });
-    const finish = () => { if (active) active.hidden = true; active = null; closing = false; };
-    window.setTimeout(finish, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 360);
+    const finish = () => {
+      if (active) active.hidden = true;
+      active = null;
+      closing = false;
+    };
+    window.setTimeout(
+      finish,
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 360,
+    );
   };
   if (deck && list && triggers) {
     deck.hidden = false;
-    triggers.forEach(trigger => trigger.addEventListener('click', () => {
-      if (active || closing) return;
-      active = deck.querySelector<HTMLElement>(`#${trigger.getAttribute('aria-controls')}`);
-      if (!active) return;
-      lastTrigger = trigger;
-      active.hidden = false;
-      active.inert = false;
-      trigger.setAttribute('aria-expanded', 'true');
-      list.inert = true;
-      // Commit the initial state so the entrance transition also works on first open.
-      active.getBoundingClientRect();
-      deck.classList.add('is-open');
-      active.querySelector<HTMLButtonElement>('.faq-close')?.focus({ preventScroll: true });
-    }));
-    deck.querySelectorAll('.faq-close').forEach(button => button.addEventListener('click', close));
-    deck.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
+    triggers.forEach((trigger) =>
+      trigger.addEventListener('click', () => {
+        if (active || closing) return;
+        active = deck.querySelector<HTMLElement>(`#${trigger.getAttribute('aria-controls')}`);
+        if (!active) return;
+        lastTrigger = trigger;
+        active.hidden = false;
+        active.inert = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        list.inert = true;
+        // Commit the initial state so the entrance transition also works on first open.
+        active.getBoundingClientRect();
+        deck.classList.add('is-open');
+        active.querySelector<HTMLButtonElement>('.faq-close')?.focus({ preventScroll: true });
+      }),
+    );
+    deck
+      .querySelectorAll('.faq-close')
+      .forEach((button) => button.addEventListener('click', close));
+    deck.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') close();
+    });
   }
 </script>

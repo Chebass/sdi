@@ -23,3 +23,11 @@ La publicación en GitHub Pages es un paso separado y manual. Estas verificacion
 - Repetidas las pruebas de menú móvil, detalles de servicios, navegación de testimonios y contenido del formulario enviado a la URL de WhatsApp mediante interceptación local, sin enviar mensajes reales.
 - Revisadas capturas de las reseñas, las preguntas y el formulario modernizado.
 - Verificada la ausencia de `astro-dev-toolbar` en el servidor de desarrollo.
+
+## Selector de servicios y formato
+
+- Choices.js probado a 1440, 768, 390 y 320 píxeles: apertura, selección, teclado, Escape y cierre al pulsar fuera del menú.
+- Verificado el campo obligatorio: muestra un error y enfoca el selector visible sin intentar enfocar el `select` oculto.
+- Comprobados el valor de servicio en FormData y el mensaje de WhatsApp mediante interceptación, sin enviar mensajes reales.
+- Verificado el selector nativo cuando JavaScript está desactivado.
+- Formateados los archivos fuente con Prettier y su plugin oficial de Astro; añadido `format:check` a las comprobaciones automáticas.
