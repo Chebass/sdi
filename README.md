@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Abrir http://127.0.0.1:4321/sdi/.
+Abrir http://127.0.0.1:4321/.
 
 ```sh
 npm run check
@@ -41,6 +41,24 @@ El carrusel de experiencia utiliza fotografías existentes y encuadres individua
 
 El selector de servicios usa Choices.js con estilos de la paleta SDI, selección por teclado y validación integrada al formulario. Sin JavaScript se mantiene el selector nativo. Para formatear Astro, CSS, TypeScript, JSON y documentación, ejecutar `npm run format`; `npm run format:check` comprueba el formato sin modificar archivos. Prettier omite dependencias, compilados y referencias locales.
 
+## Publicación en Vercel
+
+El proyecto se sirve desde `/`, sin el prefijo `/sdi`. `vercel.json` configura Astro, el comando `npm run build` y la carpeta de salida `dist`. No necesita un adaptador de servidor porque el sitio es estático.
+
+- Framework Preset: **Astro**.
+- Root Directory: raíz del repositorio.
+- Build Command: **npm run build**.
+- Output Directory: **dist**.
+- Node.js: **24.x**.
+- Si existe una variable `BASE_PATH`, eliminarla o establecerla en `/`.
+- Si existe `SITE_URL`, usar el dominio de Vercel o el dominio propio, sin `/sdi`.
+
+La configuración obtiene el dominio de las variables de Vercel y permite sobrescribirlo con `SITE_URL`. El dominio de respaldo es https://sdi-sable.vercel.app. Los enlaces antiguos `/sdi/...` se redirigen a la raíz en Vercel.
+
+Tras actualizar la configuración, desplegar el último commit de `main`. No añadir una reescritura global a `index.html`: los archivos CSS, JavaScript e imágenes deben servirse directamente desde `dist`.
+
+Guía oficial: https://docs.astro.build/en/guides/deploy/vercel/.
+
 ## Publicación en GitHub Pages
 
 El repositorio incluye comprobaciones automáticas y un flujo de publicación **manual**, para poder revisar la propuesta antes de hacerla pública.
@@ -49,7 +67,7 @@ El repositorio incluye comprobaciones automáticas y un flujo de publicación **
 2. En Actions → **Publish GitHub Pages**, ejecutar **Run workflow** sobre `main`.
 3. La URL prevista es https://chebass.github.io/sdi/; solo está disponible después de un despliegue exitoso.
 
-`astro.config.mjs` configura `site` y `base` para este repositorio. Para un dominio propio, definir `SITE_URL=https://dominio.example` y `BASE_PATH=/` durante la compilación. Se puede desplegar el directorio `dist` en cualquier alojamiento estático.
+El flujo de GitHub Pages define expresamente `SITE_URL=https://chebass.github.io` y `BASE_PATH=/sdi` durante la compilación. Vercel y el desarrollo local utilizan `/` por defecto. Para un dominio propio, definir `SITE_URL=https://dominio.example`. Se puede desplegar el directorio `dist` en cualquier alojamiento estático.
 
 Guía oficial: https://docs.astro.build/en/guides/deploy/github/.
 

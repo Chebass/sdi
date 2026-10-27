@@ -39,3 +39,11 @@ La publicación en GitHub Pages es un paso separado y manual. Estas verificacion
 - Comprobados reproducción automática, pausa y reanudación manual, pausa al pasar el cursor y desactivación con movimiento reducido.
 - Revisados encuadres y controles en capturas de escritorio y móvil. Sin JavaScript se conserva visible la primera fotografía y se ocultan los controles inactivos.
 - Compilación, revisión de Astro y formato comprobados correctamente.
+
+## Rutas de publicación en Vercel
+
+- Reproducido en el despliegue original: la portada respondía 200 pero el CSS bajo `/sdi/_astro/` respondía 404.
+- Configurado `/` como ruta predeterminada y añadido `vercel.json` con Astro, compilación, carpeta `dist` y redirección del prefijo anterior.
+- Probada la salida compilada en un servidor estático sin reescrituras: HTML, CSS, JavaScript e imágenes correctos; sin errores de recursos locales en escritorio y móvil.
+- Comprobada la URL canónica para Vercel y el selector de servicios.
+- Compilación adicional con `BASE_PATH=/sdi` y `SITE_URL=https://chebass.github.io`: prefijos de recursos de GitHub Pages conservados. Estas variables se establecen solo en su flujo de publicación.
