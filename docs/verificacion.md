@@ -31,3 +31,11 @@ La publicación en GitHub Pages es un paso separado y manual. Estas verificacion
 - Comprobados el valor de servicio en FormData y el mensaje de WhatsApp mediante interceptación, sin enviar mensajes reales.
 - Verificado el selector nativo cuando JavaScript está desactivado.
 - Formateados los archivos fuente con Prettier y su plugin oficial de Astro; añadido `format:check` a las comprobaciones automáticas.
+
+## Carrusel de experiencia
+
+- Sustituido el mosaico por cuatro vistas individuales de fotografías reales existentes; los encuadres del archivo original se muestran mediante CSS.
+- Verificados a 1440, 768, 390 y 320 píxeles: miniaturas, anterior y siguiente con retorno al inicio, teclado, gestos y altura estable al cambiar de fotografía.
+- Comprobados reproducción automática, pausa y reanudación manual, pausa al pasar el cursor y desactivación con movimiento reducido.
+- Revisados encuadres y controles en capturas de escritorio y móvil. Sin JavaScript se conserva visible la primera fotografía y se ocultan los controles inactivos.
+- Compilación, revisión de Astro y formato comprobados correctamente.

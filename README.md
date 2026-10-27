@@ -28,6 +28,7 @@ npm run preview
 - `src/styles/global.css`: paleta, tipografía y estilos para móvil y escritorio.
 - `src/styles/enhancements.css`: fondos azules, animaciones, hover y campos del formulario.
 - `src/components/Faq.astro`: preguntas con panel de altura estable y navegación por teclado.
+- `src/components/ExperienceCarousel.astro`: carrusel de experiencia, fotografías, miniaturas y controles.
 - `public/images/`: fotografías originales y portada arquitectónica.
 
 WhatsApp usa el número de la web anterior: **+51 997 084 825**. Los botones de servicios incluyen una consulta específica. El formulario valida nombre y servicio y abre WhatsApp con el mensaje preparado; no almacena ni envía información por un servidor. El usuario confirma el envío en WhatsApp. También se incluyen enlaces de correo, teléfono y ubicación.
@@ -35,6 +36,8 @@ WhatsApp usa el número de la web anterior: **+51 997 084 825**. Los botones de 
 Por indicación del propietario se muestra únicamente WhatsApp como red de contacto. La lista `socials` queda vacía y permite agregar perfiles confirmados más adelante.
 
 Las animaciones respetan la preferencia de movimiento reducido del sistema. Las preguntas muestran una respuesta a la vez dentro del mismo espacio y admiten cierre con Escape; sin JavaScript se utiliza una lista desplegable nativa. La barra de herramientas de desarrollo de Astro está desactivada en la configuración.
+
+El carrusel de experiencia utiliza fotografías existentes y encuadres individuales del archivo original, sin modificar el archivo de imagen. Permite miniaturas, flechas, teclas de dirección y gestos táctiles. Su reproducción automática se pausa al pasar el cursor, enfocar un control, salir de la sección o cambiar de pestaña, y se desactiva con movimiento reducido. El botón de pausa permite detenerla manualmente.
 
 El selector de servicios usa Choices.js con estilos de la paleta SDI, selección por teclado y validación integrada al formulario. Sin JavaScript se mantiene el selector nativo. Para formatear Astro, CSS, TypeScript, JSON y documentación, ejecutar `npm run format`; `npm run format:check` comprueba el formato sin modificar archivos. Prettier omite dependencias, compilados y referencias locales.
 

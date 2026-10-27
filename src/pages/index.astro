@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import Faq from '../components/Faq.astro';
+import ExperienceCarousel from '../components/ExperienceCarousel.astro';
 import ServiceSelect from '../components/ServiceSelect.astro';
 import { company, services, clients, testimonials, whatsappUrl } from '../data/company';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -296,18 +297,7 @@ const steps = [
           compromiso familiar.
         </p>
       </div>
-      <figure class="team-photo">
-        <img
-          src={image('equipo-sdi.jpg')}
-          alt="Archivo de SDI Ingenieros: equipo, instalaciones industriales y experiencia de trabajo en campo"
-          width="1280"
-          height="720"
-          loading="lazy"
-        />
-        <figcaption>
-          SDI Ingenieros <span>Experiencia en campo y compromiso con cada proyecto.</span>
-        </figcaption>
-      </figure>
+      <ExperienceCarousel />
       <div class="all-clients">
         <span class="eyebrow">EMPRESAS E INSTITUCIONES QUE CONFÍAN EN SDI</span>
         <div>
