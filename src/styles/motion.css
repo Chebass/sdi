@@ -1,0 +1,929 @@
+/* ── SDI motion layer ─────────────────────────────────────────────────────
+   Cursor, scroll progress, magnetic controls, tilt, spotlights and reveals.
+   Everything here respects prefers-reduced-motion and pointer capabilities. */
+
+:root {
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spot-x: 50%;
+  --spot-y: 50%;
+}
+
+html {
+  scrollbar-color: #6f8ca5 #d9e4ed;
+  scrollbar-width: thin;
+}
+
+body {
+  position: relative;
+}
+
+/* Fine film-grain to stop the large gradients from looking flat. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── Scroll progress ─────────────────────────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 3px;
+  z-index: 9997;
+  pointer-events: none;
+  background: #102b430d;
+}
+
+.scroll-progress > span {
+  display: block;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #54718d, #7fb3d8 45%, #285977);
+  box-shadow: 0 0 12px #7fb3d880;
+  will-change: transform;
+}
+
+/* ── Custom cursor ───────────────────────────────────────────────────── */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  will-change: transform;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: #fff;
+  mix-blend-mode: difference;
+}
+
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border: 1px solid #fff;
+  mix-blend-mode: difference;
+  transition:
+    width 0.35s var(--ease-smooth),
+    height 0.35s var(--ease-smooth),
+    margin 0.35s var(--ease-smooth),
+    background-color 0.35s,
+    opacity 0.25s;
+}
+
+.cursor-ring.is-visible,
+.cursor-dot.is-visible {
+  opacity: 0.9;
+}
+
+.cursor-ring.is-hover {
+  width: 62px;
+  height: 62px;
+  margin: -31px 0 0 -31px;
+  background: #ffffff1a;
+}
+
+.cursor-ring.is-press {
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+}
+
+.cursor-ring.is-text {
+  width: 3px;
+  height: 30px;
+  margin: -15px 0 0 -1.5px;
+  border-radius: 2px;
+  border-width: 1px 0 0;
+  background: transparent;
+}
+
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button,
+  html.has-custom-cursor summary {
+    cursor: none;
+  }
+
+  html.has-custom-cursor input,
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor select {
+    cursor: auto;
+  }
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
+
+/* ── Scroll-aware header ─────────────────────────────────────────────── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  backdrop-filter: blur(0);
+  transition:
+    height 0.45s var(--ease-smooth),
+    background-color 0.45s,
+    box-shadow 0.45s,
+    backdrop-filter 0.45s;
+}
+
+.header.is-scrolled {
+  height: 74px;
+  background: #f6fafde6;
+  backdrop-filter: blur(16px) saturate(1.25);
+  box-shadow: 0 18px 40px -28px #102b4366;
+}
+
+.header.is-scrolled .brand-mark {
+  transition:
+    height 0.45s var(--ease-smooth),
+    width 0.45s var(--ease-smooth);
+  width: 35px;
+  height: 40px;
+}
+
+.header.is-scrolled .brand-word {
+  transition: font-size 0.45s var(--ease-smooth);
+  font-size: 32px;
+}
+
+.desktop-nav a.is-active {
+  color: var(--navy);
+}
+
+.desktop-nav a.is-active::after {
+  right: 0;
+}
+
+.desktop-nav a::after {
+  transition: right 0.35s var(--ease-smooth);
+}
+
+/* ── Hero: depth, light and parallax ─────────────────────────────────── */
+.hero-image {
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+  animation: hero-enter 1.8s var(--ease-smooth) both;
+  transform: translate3d(var(--hero-x, 0px), calc(var(--hero-y, 0px) + var(--hero-scroll, 0px)), 0);
+  transition: transform 1.1s var(--ease-smooth);
+  will-change: transform;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    760px circle at var(--hero-mx, 72%) var(--hero-my, 42%),
+    #ffffff2b,
+    transparent 62%
+  );
+  transition: background 0.4s;
+}
+
+.hero-content,
+.hero-bottom,
+.hero-index {
+  z-index: 2;
+}
+
+.hero h1 .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+
+.hero h1 .line > span {
+  display: block;
+  animation: hero-line 1.05s var(--ease-smooth) both;
+}
+
+.hero h1 .line:nth-child(1) > span {
+  animation-delay: 0.08s;
+}
+
+.hero h1 .line:nth-child(2) > span {
+  animation-delay: 0.18s;
+}
+
+.hero h1 .line:nth-child(3) > span {
+  animation-delay: 0.28s;
+}
+
+.hero-content > .eyebrow {
+  animation: hero-fade 0.9s var(--ease-smooth) 0.02s both;
+}
+
+.hero-content > p,
+.hero-content > .button {
+  animation: hero-fade 0.9s var(--ease-smooth) both;
+}
+
+.hero-content > p {
+  animation-delay: 0.38s;
+}
+
+.hero-content > .button {
+  animation-delay: 0.48s;
+}
+
+.hero-bottom {
+  animation: hero-fade 1s var(--ease-smooth) 0.6s both;
+}
+
+.hero-bottom a {
+  color: #fff;
+  text-shadow: 0 1px 12px #071d31b8;
+}
+
+.hero-bottom a span {
+  background: #0d27383d;
+  backdrop-filter: blur(6px);
+  transition:
+    transform 0.35s var(--ease-spring),
+    background-color 0.3s,
+    border-color 0.3s;
+}
+
+.hero-bottom a:hover span {
+  transform: translateY(4px);
+  border-color: #fff;
+  background: #0d27385c;
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    scale: 1.06;
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes hero-line {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Magnetic elements ───────────────────────────────────────────────── */
+[data-magnetic] {
+  translate: var(--mag-x, 0px) var(--mag-y, 0px);
+  transition:
+    translate 0.45s var(--ease-smooth),
+    background 0.25s,
+    transform 0.25s,
+    box-shadow 0.3s,
+    color 0.25s;
+  will-change: translate;
+}
+
+/* ── Tilt / 3D cards ─────────────────────────────────────────────────── */
+[data-tilt] {
+  transform: perspective(1100px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.7s var(--ease-smooth);
+  will-change: transform;
+}
+
+[data-tilt].is-tilting {
+  transition: transform 0.12s linear;
+}
+
+[data-tilt] .circle-arrow,
+[data-tilt] .image-card-copy {
+  transform: translateZ(28px);
+}
+
+/* ── Cursor spotlight on cards ───────────────────────────────────────── */
+.service,
+.testimonial,
+.about-principles > div,
+.purpose article,
+.contact-form,
+.faq-deck,
+.all-clients > div > span,
+.process-photo,
+.experience-carousel {
+  position: relative;
+}
+
+.service::after,
+.testimonial::before,
+.about-principles > div::after,
+.purpose article::after,
+.contact-form::after,
+.faq-deck::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s;
+  background: radial-gradient(
+    260px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    #a8d5f42e,
+    transparent 70%
+  );
+}
+
+@media (hover: hover) {
+  .service:hover::after,
+  .testimonial:hover::before,
+  .about-principles > div:hover::after,
+  .purpose article:hover::after,
+  .contact-form:hover::after,
+  .faq-deck:hover::after {
+    opacity: 1;
+  }
+}
+
+.service > *,
+.testimonial > *,
+.about-principles > div > *,
+.purpose article > *,
+.contact-form > *,
+.faq-deck > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Button shine ────────────────────────────────────────────────────── */
+.button,
+.button-white,
+.circle-arrow,
+.experience-navigation button,
+.slider-buttons button {
+  position: relative;
+  overflow: hidden;
+}
+
+.button::before,
+.button-white::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -80%;
+  width: 45%;
+  transform: skewX(-22deg);
+  background: linear-gradient(90deg, transparent, #ffffff4d, transparent);
+  pointer-events: none;
+  transition: left 0.7s var(--ease-smooth);
+}
+
+.button:hover::before,
+.button-white:hover::before {
+  left: 135%;
+}
+
+.button {
+  box-shadow: 0 10px 24px -14px #102b4380;
+}
+
+.button:hover {
+  box-shadow: 0 16px 30px -16px #102b43a6;
+}
+
+.button-white {
+  box-shadow: 0 12px 28px -18px #000;
+}
+
+/* Refined text links */
+.text-link {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
+  transition:
+    background-size 0.4s var(--ease-smooth),
+    color 0.3s,
+    gap 0.4s var(--ease-smooth);
+}
+
+.text-link:hover {
+  background-size: 0 1px;
+  gap: 26px;
+}
+
+/* ── Section eyebrows ────────────────────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 17px;
+  height: 1px;
+  flex-shrink: 0;
+  background: currentColor;
+  opacity: 0.45;
+  transition: width 0.4s var(--ease-smooth);
+}
+
+.section:hover > .eyebrow::before,
+.section-heading:hover .eyebrow::before {
+  width: 30px;
+}
+
+/* ── Image cards ─────────────────────────────────────────────────────── */
+.image-card {
+  box-shadow: 0 18px 40px -30px #102b4399;
+}
+
+.image-card img {
+  transition:
+    transform 1s var(--ease-smooth),
+    filter 0.6s,
+    opacity 0.6s;
+}
+
+.image-card:hover img {
+  transform: scale(1.055);
+  filter: saturate(1.08);
+}
+
+.image-card > div {
+  z-index: 2;
+}
+
+.image-card::after {
+  transition: opacity 0.5s;
+  background: linear-gradient(0deg, #071f35ee 0%, #0b233c73 45%, transparent 92%);
+}
+
+.image-card:hover::after {
+  opacity: 0.92;
+}
+
+.circle-arrow {
+  transition:
+    background-color 0.35s,
+    border-color 0.35s,
+    transform 0.35s var(--ease-spring);
+}
+
+.image-card:hover .circle-arrow {
+  background: #eaf5fb;
+  color: var(--navy);
+  border-color: #eaf5fb;
+}
+
+/* ── Client marquee ──────────────────────────────────────────────────── */
+.client-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.client-track {
+  display: flex;
+  width: max-content;
+  animation: client-marquee 42s linear infinite;
+}
+
+.client-marquee:hover .client-track {
+  animation-play-state: paused;
+}
+
+.client-row {
+  display: flex;
+  align-items: center;
+  gap: 62px;
+  padding-right: 62px;
+}
+
+.client-row > span {
+  flex: 0 0 auto;
+  transition:
+    color 0.3s,
+    transform 0.35s var(--ease-smooth),
+    opacity 0.3s;
+}
+
+.client-row > span:hover {
+  color: var(--navy);
+  transform: translateY(-3px);
+}
+
+@keyframes client-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────── */
+.service {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.service::after {
+  border-radius: 16px;
+}
+
+@media (hover: hover) {
+  .service:hover {
+    box-shadow: 0 22px 45px -24px #21486766;
+  }
+}
+
+/* ── Purpose: slowly drifting orbital rings ──────────────────────────── */
+.purpose::before {
+  animation: orbit-spin 42s linear infinite;
+}
+
+.purpose::after {
+  content: '';
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  left: -220px;
+  bottom: -320px;
+  border-radius: 50%;
+  border: 1px solid #b2d2eb1f;
+  box-shadow:
+    0 0 0 70px #b2d2eb0a,
+    0 0 0 140px #b2d2eb05;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes orbit-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* ── Testimonials: grab & drag ───────────────────────────────────────── */
+.testimonial-track {
+  cursor: grab;
+  overscroll-behavior-x: contain;
+}
+
+.testimonial-track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+.testimonial-track.is-dragging .testimonial {
+  user-select: none;
+}
+
+.testimonial {
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .testimonial:hover {
+    transform: translateY(-8px) scale(1.005);
+    transition: transform 0.35s var(--ease-smooth);
+  }
+}
+
+/* ── FAQ deck ────────────────────────────────────────────────────────── */
+.faq-deck {
+  box-shadow: 0 24px 50px -38px #21486777;
+}
+
+/* ── Contact: cursor light ───────────────────────────────────────────── */
+.contact::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    520px circle at var(--spot-x, 78%) var(--spot-y, 28%),
+    #8ec8f51c,
+    transparent 68%
+  );
+  transition: background 0.5s;
+}
+
+.contact > * {
+  position: relative;
+  z-index: 1;
+}
+
+.contact-form {
+  overflow: visible;
+}
+
+.contact-form input,
+.contact-form textarea {
+  transition: color 0.3s;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+.footer-main a {
+  transition:
+    color 0.3s,
+    translate 0.35s var(--ease-smooth);
+}
+
+.footer-main a:not(.brand):hover {
+  color: var(--navy);
+  translate: 3px 0;
+}
+
+/* ── Floating WhatsApp ───────────────────────────────────────────────── */
+.whatsapp-float {
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    width 0.45s var(--ease-smooth),
+    background-color 0.3s,
+    transform 0.4s var(--ease-spring),
+    border-radius 0.45s var(--ease-smooth),
+    box-shadow 0.3s;
+}
+
+.whatsapp-float > svg {
+  flex-shrink: 0;
+}
+
+.whatsapp-float > span {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-width 0.45s var(--ease-smooth),
+    opacity 0.3s,
+    margin 0.45s var(--ease-smooth);
+}
+
+.whatsapp-float:hover {
+  width: 144px;
+  border-radius: 32px;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 14px 34px #102b4355;
+}
+
+.whatsapp-float:hover > span {
+  max-width: 80px;
+  opacity: 1;
+  margin-left: 9px;
+}
+
+@media (hover: none) {
+  .whatsapp-float:hover {
+    width: 51px;
+    border-radius: 50%;
+  }
+
+  .whatsapp-float:hover > span {
+    max-width: 0;
+    opacity: 0;
+    margin-left: 0;
+  }
+}
+
+/* ── Mobile menu ─────────────────────────────────────────────────────── */
+.mobile-menu summary > span {
+  transition:
+    transform 0.35s var(--ease-smooth),
+    opacity 0.25s;
+}
+
+.mobile-menu[open] summary > span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.mobile-menu[open] summary > span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu[open] summary > span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+.mobile-menu[open] nav {
+  transform-origin: top right;
+  animation: menu-in 0.38s var(--ease-smooth) both;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Reveal choreography ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    scale: 0.985;
+    filter: blur(7px);
+    transition:
+      opacity 0.85s var(--ease-smooth) var(--reveal-delay, 0ms),
+      scale 0.85s var(--ease-smooth) var(--reveal-delay, 0ms),
+      filter 0.85s var(--ease-smooth) var(--reveal-delay, 0ms);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0);
+  }
+
+  /* Keep hover transitions when a service card also has a scroll reveal. */
+  .service.reveal {
+    transition:
+      opacity 0.85s var(--ease-smooth) var(--reveal-delay, 0ms),
+      scale 0.85s var(--ease-smooth) var(--reveal-delay, 0ms),
+      filter 0.85s var(--ease-smooth) var(--reveal-delay, 0ms),
+      translate 0.45s var(--ease-smooth),
+      background-color 0.45s var(--ease-smooth),
+      box-shadow 0.45s var(--ease-smooth);
+  }
+
+  .status-dot {
+    animation: status-pulse 2.6s ease-out infinite;
+  }
+
+  @keyframes status-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 4px #86b9dd14;
+    }
+    55% {
+      box-shadow: 0 0 0 10px #86b9dd05;
+    }
+  }
+
+  /* Gentle floating accent for the process badge. */
+  .process-photo > a {
+    animation: badge-float 6s ease-in-out infinite;
+  }
+
+  @keyframes badge-float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0);
+    }
+    50% {
+      transform: translateY(-9px) rotate(3deg);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-image {
+    transform: none;
+  }
+  .client-track {
+    animation: none;
+  }
+
+  .client-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .client-marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .hero h1 .line > span,
+  .hero-content > *,
+  .hero-bottom {
+    animation: none;
+  }
+}
+
+/* ── Responsive tuning ───────────────────────────────────────────────── */
+@media (max-width: 1050px) {
+  .header.is-scrolled {
+    height: 70px;
+  }
+
+  .hero-image {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .header.is-scrolled {
+    height: 66px;
+  }
+
+  .header.is-scrolled .brand-mark {
+    width: 30px;
+    height: 35px;
+  }
+
+  .header.is-scrolled .brand-word {
+    font-size: 28px;
+  }
+
+  .client-row {
+    gap: 38px;
+    padding-right: 38px;
+  }
+
+  .client-track {
+    animation-duration: 30s;
+  }
+
+  .eyebrow::before {
+    width: 12px;
+  }
+
+  .scroll-progress {
+    height: 2px;
+  }
+
+  .service .text-link {
+    white-space: nowrap;
+    gap: 4px;
+    font-size: 9px;
+  }
+
+  .service .text-link svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .reveal {
+    filter: blur(4px);
+  }
+}
+
+@media print {
+  .scroll-progress,
+  .cursor-dot,
+  .cursor-ring,
+  .whatsapp-float {
+    display: none !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    scale: 1 !important;
+    filter: none !important;
+  }
+
+  .header {
+    position: static;
+  }
+}

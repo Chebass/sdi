@@ -42,11 +42,17 @@ const steps = [
           <span class="status-dot"></span> INGENIERÍA CON PROPÓSITO
         </span>
         <h1 id="hero-title">
-          La seguridad
-          <br />
-          de tu proyecto
-          <br />
-          <em>empieza en la base.</em>
+          <span class="line">
+            <span>La seguridad</span>
+          </span>
+          <span class="line">
+            <span>de tu proyecto</span>
+          </span>
+          <span class="line">
+            <span>
+              <em>empieza en la base.</em>
+            </span>
+          </span>
         </h1>
         <p>
           Soluciones de puesta a tierra que protegen tus instalaciones y lo que más importa: las
@@ -113,15 +119,21 @@ const steps = [
 
     <section class="clients" aria-label="Clientes de SDI">
       <span class="eyebrow">CONFIANZA QUE NOS IMPULSA</span>
-      <div class="client-row">
-        {clients.slice(0, 4).map((client, index) => (
-          <span>
-            <span class="client-symbol" aria-hidden="true">
-              {['✳', '◈', '⊕', '▥'][index]}
-            </span>
-            {client}
-          </span>
-        ))}
+      <div class="client-marquee">
+        <div class="client-track">
+          {[0, 1].map((copy) => (
+            <div class="client-row" aria-hidden={copy === 1 ? 'true' : undefined}>
+              {clients.map((client, index) => (
+                <span>
+                  <span class="client-symbol" aria-hidden="true">
+                    {['✳', '◈', '⊕', '▥', '✳', '◈', '⊕', '▥'][index]}
+                  </span>
+                  {client}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
 
@@ -455,33 +467,6 @@ const steps = [
       ?.addEventListener('input', (event) =>
         (event.target as HTMLInputElement).setCustomValidity(''),
       );
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const revealItems = document.querySelectorAll<HTMLElement>(
-      '.section-heading, .about-copy, .about-principles > div, .image-card, .service, .purpose article, .process-intro, .steps li, .team-photo, .all-clients, .faq > div:first-child, .contact-copy, .contact-form',
-    );
-    if (!motionQuery.matches && 'IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
-        (entries) =>
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              observer.unobserve(entry.target);
-            }
-          }),
-        { threshold: 0.08 },
-      );
-      revealItems.forEach((item, index) => {
-        item.classList.add('reveal');
-        item.style.setProperty('--reveal-delay', (index % 3) * 65 + 'ms');
-        observer.observe(item);
-      });
-      motionQuery.addEventListener('change', (event) => {
-        if (event.matches) {
-          observer.disconnect();
-          revealItems.forEach((item) => item.classList.add('is-visible'));
-        }
-      });
-    }
     const track = document.querySelector<HTMLElement>('.testimonial-track');
     const move = (direction: number) => {
       const card = track?.querySelector<HTMLElement>('.testimonial');
